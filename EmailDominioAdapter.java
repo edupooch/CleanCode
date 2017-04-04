@@ -6,14 +6,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Filter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Collections;
-
-import br.edu.ufcspa.voltaparacasa.R;
 
 /**
  * Esta classe representa um adapter de um AutoCompleteTextView, componente do android que será
@@ -26,18 +22,18 @@ import br.edu.ufcspa.voltaparacasa.R;
  */
 
 public class EmailDominioAdapter extends ArrayAdapter<String> {
-    private final String MY_DEBUG_TAG = "EmailDominioAdapter";
-    private ArrayList<String> items;
-    private ArrayList<String> itemsAll;
-    private ArrayList<String> suggestions;
-    private int viewResourceId;
 
-    public EmailDominioAdapter(Context context, int viewResourceId, ArrayList<String> items) {
-        super(context, viewResourceId, items);
-        this.items = items;
-        this.itemsAll = (ArrayList<String>) items.clone();
-        this.suggestions = new ArrayList<String>();
-        this.viewResourceId = viewResourceId;
+    private static final int LAYOUT_DO_BOX = android.R.layout.simple_list_item_1;
+
+    private ArrayList<String> items;
+    private ArrayList<String> itemsClone;
+    private ArrayList<String> suggestions;
+
+    public EmailDominioAdapter(Context context, ArrayList<String> dominiosDisponiveis) {
+        super(context, LAYOUT_DO_BOX, dominiosDisponiveis);
+        this.items = dominiosDisponiveis;
+        this.itemsClone = new ArrayList<>(dominiosDisponiveis);
+        this.suggestions = new ArrayList<>();
     }
 
 
@@ -46,7 +42,7 @@ public class EmailDominioAdapter extends ArrayAdapter<String> {
         View v = convertView;
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            v = vi.inflate(viewResourceId, null);
+            v = vi.inflate(LAYOUT_DO_BOX, null);
         }
         String customer = items.get(position);
         if (customer != null) {
@@ -82,7 +78,7 @@ public class EmailDominioAdapter extends ArrayAdapter<String> {
                         antesArroba ="";
                     }
                     suggestions.clear();
-                    for (String customer : itemsAll) {
+                    for (String customer : itemsClone) {
                         if(customer.toLowerCase().startsWith(palabra2.toLowerCase())){
                             suggestions.add(antesArroba+customer);
                         }
