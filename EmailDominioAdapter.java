@@ -15,6 +15,16 @@ import java.util.Collections;
 
 import br.edu.ufcspa.voltaparacasa.R;
 
+/**
+ * Esta classe representa um adapter de um AutoCompleteTextView, componente do android que será
+ * utilizado para sugerir domínios de email para o usuário em seu cadastro/login na aplicação assim
+ * que o usuário digitar o char '@'
+ *
+ * Os domínios de email sugeridos são os domínios institucionais até então aceitos pelo sistema.
+ *
+ * Created by edupooch on 12/03/2017.
+ */
+
 public class EmailDominioAdapter extends ArrayAdapter<String> {
     private final String MY_DEBUG_TAG = "EmailDominioAdapter";
     private ArrayList<String> items;
