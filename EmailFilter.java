@@ -27,9 +27,12 @@ class EmailFilter extends Filter {
         if (palavra != null && palavra.toString().contains("@")) {
             return getFilterResults(palavra.toString());
         }
-        return new Filter.FilterResults();
+        return new Filter.FilterResults(); //não há nenhuma sugestão
     }
-
+    /**Método para verificar as opções disponíveis de sugestão baseadas no texto 
+    * já digitado pelo user
+     *
+     */
     @NonNull
     private Filter.FilterResults getFilterResults(String palavra) {
         String depoisArroba = palavra.substring(palavra.indexOf("@"));
@@ -56,7 +59,11 @@ class EmailFilter extends Filter {
             return "";
         }
     }
-
+    
+    /**Método que envia sugestões filtradas e atualiza o adapter, pode não retornar nada
+     * caso o texto digitado pelo usuário não seja compatível com nenhum domínio cadastrado
+     *
+     */
     @Override
     protected void publishResults(CharSequence constraint, Filter.FilterResults results) {
         ArrayList<String> listaComFiltro = (ArrayList<String>) results.values;
