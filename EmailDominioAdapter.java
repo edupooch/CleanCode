@@ -15,9 +15,9 @@ import java.util.ArrayList;
  * Esta classe representa um adapter de um AutoCompleteTextView, componente do android que será
  * utilizado para sugerir domínios de email para o usuário em seu cadastro/login na aplicação assim
  * que o usuário digitar o char '@'
- *
+ * <p>
  * Os domínios de email sugeridos são os domínios institucionais até então aceitos pelo sistema.
- *
+ * <p>
  * Created by edupooch on 12/03/2017.
  */
 
@@ -27,85 +27,94 @@ public class EmailDominioAdapter extends ArrayAdapter<String> {
 
     private ArrayList<String> items;
     private ArrayList<String> itemsClone;
-    private ArrayList<String> suggestions;
+    private ArrayList<String> sugestoes;
+
+    private Filter nameFilter;
 
     public EmailDominioAdapter(Context context, ArrayList<String> dominiosDisponiveis) {
         super(context, LAYOUT_DO_BOX, dominiosDisponiveis);
         this.items = dominiosDisponiveis;
         this.itemsClone = new ArrayList<>(dominiosDisponiveis);
-        this.suggestions = new ArrayList<>();
+        this.sugestoes = new ArrayList<>();
+        this.nameFilter = criaNameFilter();
     }
 
+    /**
+     * Método que cria a view de cada sugestão de domínio
+     *
+     * @param position posição no ArrayList de domínios
+     * @param convertView recurso do adapter para otimizar o carregamento com reutilização de views
+     * @param parent edit text que terá o combo box
+     *
+     * @return view da caixa com a sugestão
+     */
+    @NonNull
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+        View view = convertView;
+        LayoutInflater inflater = LayoutInflater.from(getContext());
 
+        if (convertView == null)
+            view = inflater.inflate(LAYOUT_DO_BOX, parent, false);
 
-    public View getView(int position, View convertView, ViewGroup parent) {
-        View v = convertView;
-        if (v == null) {
-            LayoutInflater vi = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            v = vi.inflate(LAYOUT_DO_BOX, null);
-        }
-        String customer = items.get(position);
-        if (customer != null) {
-            TextView customerNameLabel = (TextView)v;
-            if (customerNameLabel != null) {
-                customerNameLabel.setText(customer);
-            }
-        }
-        return v;
+        String dominio = items.get(position);
+        TextView textDominio = (TextView) view;
+        textDominio.setText(dominio);
+
+        return view;
     }
 
     @NonNull
-    @Override
     public Filter getFilter() {
         return nameFilter;
     }
 
-    private Filter nameFilter = new Filter() {
-        public String convertResultToString(Object resultValue) {
-            return (String)resultValue;
-        }
-        @Override
-        protected FilterResults performFiltering(CharSequence constraint) {
-            if (constraint != null){
-                String palabra = constraint.toString();
-                if(palabra.contains("@")) {
-                    String palabra2 = palabra.substring(palabra.indexOf("@"));
-                    String antesArroba;
-                    try{
-                        antesArroba = palabra.substring(0, palabra.indexOf("@"));
-                    }catch (Exception ex)
-                    {
-                        antesArroba ="";
-                    }
-                    suggestions.clear();
-                    for (String customer : itemsClone) {
-                        if(customer.toLowerCase().startsWith(palabra2.toLowerCase())){
-                            suggestions.add(antesArroba+customer);
+    private Filter criaNameFilter() {
+        return new Filter() {
+            public String convertResultToString(Object resultValue) {
+                return (String) resultValue;
+            }
+
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                if (constraint != null) {
+                    String palabra = constraint.toString();
+                    if (palabra.contains("@")) {
+                        String palabra2 = palabra.substring(palabra.indexOf("@"));
+                        String antesArroba;
+                        try {
+                            antesArroba = palabra.substring(0, palabra.indexOf("@"));
+                        } catch (Exception ex) {
+                            antesArroba = "";
                         }
+                        sugestoes.clear();
+                        for (String customer : itemsClone) {
+                            if (customer.toLowerCase().startsWith(palabra2.toLowerCase())) {
+                                sugestoes.add(antesArroba + customer);
+                            }
+                        }
+                        FilterResults filterResults = new FilterResults();
+                        filterResults.values = sugestoes;
+                        filterResults.count = sugestoes.size();
+                        return filterResults;
+                    } else {
+                        return new FilterResults();
                     }
-                    FilterResults filterResults = new FilterResults();
-                    filterResults.values = suggestions;
-                    filterResults.count = suggestions.size();
-                    return filterResults;
                 } else {
                     return new FilterResults();
                 }
-            }else {
-                return new FilterResults();
             }
-        }
 
-        @Override
-        protected void publishResults(CharSequence constraint, FilterResults results) {
-            ArrayList<String> filteredList = (ArrayList<String>) results.values;
-            if(results.count > 0) {
-                clear();
-                for (String c : filteredList) {
-                    add(c);
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                ArrayList<String> filteredList = (ArrayList<String>) results.values;
+                if (results.count > 0) {
+                    clear();
+                    for (String c : filteredList) {
+                        add(c);
+                    }
+                    notifyDataSetChanged();
                 }
-                notifyDataSetChanged();
             }
-        }
-    };
-
+        };
+    }
 }
